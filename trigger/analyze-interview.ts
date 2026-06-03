@@ -33,6 +33,12 @@ export const analyzeInterviewTask = schemaTask({
       userId,
     } = payload;
 
+    // Reset status at the start of every attempt so retries don't leave "failed" visible
+    await prisma.response.update({
+      where: { id: responseId },
+      data: { analysisStatus: "analyzing" },
+    });
+
     try {
       // Fetch audio from Blob and convert to base64
       const audioRes = await fetch(audioUrl);
@@ -64,25 +70,28 @@ export const analyzeInterviewTask = schemaTask({
         jobDescription: response.session.jobDescription ?? undefined,
       });
 
-      // Save feedback
-      await prisma.feedback.create({
-        data: {
-          responseId,
-          overallScore: feedback.overallScore,
-          contentScore: feedback.contentScore,
-          deliveryScore: feedback.deliveryScore,
-          eyeContactScore: feedback.eyeContactScore,
-          bodyLanguageScore: feedback.bodyLanguageScore,
-          contentFeedback: feedback.contentFeedback,
-          deliveryFeedback: feedback.deliveryFeedback,
-          eyeContactFeedback: feedback.eyeContactFeedback,
-          bodyLanguageFeedback: feedback.bodyLanguageFeedback,
-          overallFeedback: feedback.overallFeedback,
-          modelAnswer: feedback.modelAnswer,
-          fillerWords: feedback.fillerWords,
-          missingStarComponents: feedback.missingStarComponents,
-          resumeAlignmentNotes: feedback.resumeAlignmentNotes,
-        },
+      // Save feedback (upsert guards against duplicate on retry)
+      const feedbackData = {
+        overallScore: feedback.overallScore,
+        contentScore: feedback.contentScore,
+        deliveryScore: feedback.deliveryScore,
+        eyeContactScore: feedback.eyeContactScore,
+        bodyLanguageScore: feedback.bodyLanguageScore,
+        contentFeedback: feedback.contentFeedback,
+        deliveryFeedback: feedback.deliveryFeedback,
+        eyeContactFeedback: feedback.eyeContactFeedback,
+        bodyLanguageFeedback: feedback.bodyLanguageFeedback,
+        overallFeedback: feedback.overallFeedback,
+        modelAnswer: feedback.modelAnswer,
+        fillerWords: feedback.fillerWords,
+        missingStarComponents: feedback.missingStarComponents,
+        resumeAlignmentNotes: feedback.resumeAlignmentNotes,
+      };
+
+      await prisma.feedback.upsert({
+        where: { responseId },
+        create: { responseId, ...feedbackData },
+        update: feedbackData,
       });
 
       // Update response with results

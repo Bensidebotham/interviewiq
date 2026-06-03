@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, useCallback } from "react"
 import { Mic, MicOff, Square, Video } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-type Phase = "idle" | "recording" | "processing" | "done"
+type Phase = "idle" | "recording" | "processing" | "waiting" | "done"
 
 type Props = {
   sessionId: string
@@ -34,8 +34,7 @@ async function uploadAudio(audioBlob: Blob, responseId: string): Promise<string>
   const res = await fetch("/api/upload", { method: "POST", body: formData })
   const data = await res.json()
   if (!res.ok) throw new Error(data.error ?? "Audio upload failed")
-  const { url } = data
-  return url
+  return data.url
 }
 
 export function VideoRecorder({ sessionId, questionText, questionCategory, sessionType, onComplete }: Props) {
@@ -50,6 +49,7 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
   const audioRecorderRef = useRef<MediaRecorder | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const frameTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const capturedFramesRef = useRef<string[]>([])
   const startTimeRef = useRef<number>(0)
   const responseIdRef = useRef<string | null>(null)
@@ -64,7 +64,29 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
     stopStream()
     if (timerRef.current) clearInterval(timerRef.current)
     if (frameTimerRef.current) clearInterval(frameTimerRef.current)
+    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
   }, [stopStream])
+
+  const startPolling = useCallback((responseId: string) => {
+    pollIntervalRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/responses/${responseId}/status`)
+        const data = await res.json()
+
+        if (data.status === "done") {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+          setPhase("done")
+          onComplete(data.feedback, data.transcript ?? "")
+        } else if (data.status === "failed") {
+          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+          setError(data.error ?? "Analysis failed. Please try again.")
+          setPhase("idle")
+        }
+      } catch {
+        // Network error during poll — keep trying
+      }
+    }, 3000)
+  }, [onComplete])
 
   const startRecording = async () => {
     setError(null)
@@ -105,7 +127,6 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
         setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000))
       }, 1000)
 
-      // Snapshot a frame every 5 s; keep the latest 8 to stay memory-light
       frameTimerRef.current = setInterval(() => {
         if (videoRef.current) {
           capturedFramesRef.current.push(captureFrame(videoRef.current))
@@ -124,7 +145,6 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
     if (frameTimerRef.current) clearInterval(frameTimerRef.current)
     const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
 
-    // Always grab a final frame before killing the stream
     if (videoRef.current) capturedFramesRef.current.push(captureFrame(videoRef.current))
 
     audioRecorderRef.current?.stop()
@@ -133,7 +153,6 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
     const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" })
     audioChunksRef.current = []
 
-    // Pick 6 evenly-spaced frames from whatever we captured
     const all = capturedFramesRef.current
     const frames =
       all.length <= 6
@@ -148,7 +167,7 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
       setProcessingStep("Uploading recording…")
       const audioUrl = await uploadAudio(audioBlob, responseIdRef.current!)
 
-      setProcessingStep("Analyzing with AI — this takes ~15 seconds…")
+      setProcessingStep("Queuing analysis…")
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,12 +183,12 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
 
       if (!res.ok) {
         const data = await res.json()
-        throw new Error(data.error ?? "Analysis failed")
+        throw new Error(data.error ?? "Failed to queue analysis")
       }
 
-      const { feedback, transcript } = await res.json()
-      setPhase("done")
-      onComplete(feedback, transcript)
+      const { responseId } = await res.json()
+      setPhase("waiting")
+      startPolling(responseId)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong")
       setPhase("idle")
@@ -224,6 +243,14 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="h-6 w-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
             <p className="text-sm text-gray-400">{processingStep}</p>
+          </div>
+        )}
+
+        {phase === "waiting" && (
+          <div className="flex flex-col items-center gap-2 text-center">
+            <div className="h-6 w-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+            <p className="text-sm text-gray-400">Analyzing your response…</p>
+            <p className="text-xs text-gray-600">This takes about 15–20 seconds</p>
           </div>
         )}
 

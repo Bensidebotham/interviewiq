@@ -92,6 +92,8 @@ model Response {
   transcript       String?          @db.Text
   audioUrl         String?
   durationSeconds  Int?
+  analysisStatus   String           @default("pending")
+  triggerRunId     String?
   feedback         Feedback?
   createdAt        DateTime         @default(now())
 }

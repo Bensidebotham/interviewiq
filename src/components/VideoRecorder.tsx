@@ -49,10 +49,11 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
   const audioRecorderRef = useRef<MediaRecorder | null>(null)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const frameTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const pollIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const capturedFramesRef = useRef<string[]>([])
   const startTimeRef = useRef<number>(0)
   const responseIdRef = useRef<string | null>(null)
+  const onCompleteRef = useRef(onComplete)
 
   const stopStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop())
@@ -64,29 +65,34 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
     stopStream()
     if (timerRef.current) clearInterval(timerRef.current)
     if (frameTimerRef.current) clearInterval(frameTimerRef.current)
-    if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
+    if (pollIntervalRef.current) clearTimeout(pollIntervalRef.current)
   }, [stopStream])
 
-  const startPolling = useCallback((responseId: string) => {
-    pollIntervalRef.current = setInterval(async () => {
-      try {
-        const res = await fetch(`/api/responses/${responseId}/status`)
-        const data = await res.json()
+  useEffect(() => { onCompleteRef.current = onComplete }, [onComplete])
 
-        if (data.status === "done") {
-          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-          setPhase("done")
-          onComplete(data.feedback, data.transcript ?? "")
-        } else if (data.status === "failed") {
-          if (pollIntervalRef.current) clearInterval(pollIntervalRef.current)
-          setError(data.error ?? "Analysis failed. Please try again.")
-          setPhase("idle")
+  const startPolling = useCallback((responseId: string) => {
+    const schedulePoll = () => {
+      pollIntervalRef.current = setTimeout(async () => {
+        try {
+          const res = await fetch(`/api/responses/${responseId}/status`)
+          const data = await res.json()
+
+          if (data.status === "done") {
+            setPhase("done")
+            onCompleteRef.current(data.feedback, data.transcript ?? "")
+          } else if (data.status === "failed") {
+            setError(data.error ?? "Analysis failed. Please try again.")
+            setPhase("idle")
+          } else {
+            schedulePoll()
+          }
+        } catch {
+          schedulePoll()
         }
-      } catch {
-        // Network error during poll — keep trying
-      }
-    }, 3000)
-  }, [onComplete])
+      }, 3000)
+    }
+    schedulePoll()
+  }, [])
 
   const startRecording = async () => {
     setError(null)

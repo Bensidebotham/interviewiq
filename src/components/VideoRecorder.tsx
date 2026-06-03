@@ -32,8 +32,9 @@ async function uploadAudio(audioBlob: Blob, responseId: string): Promise<string>
   const formData = new FormData()
   formData.append("audio", new File([audioBlob], `recording-${responseId}.webm`, { type: audioBlob.type || "audio/webm" }))
   const res = await fetch("/api/upload", { method: "POST", body: formData })
-  if (!res.ok) throw new Error("Audio upload failed")
-  const { url } = await res.json()
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? "Audio upload failed")
+  const { url } = data
   return url
 }
 

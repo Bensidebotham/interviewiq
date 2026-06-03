@@ -15,11 +15,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "No audio file provided" }, { status: 400 })
   }
 
-  const blob = await put(
-    `recordings/${session.user.id}/${Date.now()}.webm`,
-    file,
-    { access: "public" }
-  )
-
-  return NextResponse.json({ url: blob.url })
+  try {
+    const blob = await put(
+      `recordings/${session.user.id}/${Date.now()}.webm`,
+      file,
+      { access: "public" }
+    )
+    return NextResponse.json({ url: blob.url })
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Unknown blob error"
+    console.error("[upload] Blob put failed:", message)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

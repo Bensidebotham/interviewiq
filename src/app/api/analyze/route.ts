@@ -38,22 +38,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Response not found" }, { status: 404 })
   }
 
-  const handle = await tasks.trigger("analyze-interview", {
-    responseId,
-    questionText,
-    sessionType,
-    audioUrl,
-    frames,
-    durationSeconds,
-    userId: session.user.id,
+  // Mark analyzing before enqueuing to avoid race where task completes
+  // before this update runs and overwrites "done" back to "analyzing"
+  await prisma.response.update({
+    where: { id: responseId },
+    data: { analysisStatus: "analyzing" },
   })
+
+  let handle: Awaited<ReturnType<typeof tasks.trigger>>
+  try {
+    handle = await tasks.trigger("analyze-interview", {
+      responseId,
+      questionText,
+      sessionType,
+      audioUrl,
+      frames,
+      durationSeconds,
+      userId: session.user.id,
+    })
+  } catch (err) {
+    console.error("tasks.trigger failed:", err)
+    await prisma.response
+      .update({ where: { id: responseId }, data: { analysisStatus: "failed" } })
+      .catch(() => {})
+    return NextResponse.json({ error: "Failed to queue analysis" }, { status: 503 })
+  }
 
   await prisma.response.update({
     where: { id: responseId },
-    data: {
-      analysisStatus: "analyzing",
-      triggerRunId: handle.id,
-    },
+    data: { triggerRunId: handle.id },
   })
 
   return NextResponse.json({ runId: handle.id, responseId }, { status: 202 })

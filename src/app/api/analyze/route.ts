@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
     })
   } catch (err) {
     console.error("Gemini analysis failed:", err)
-    return NextResponse.json({ error: "Analysis failed — check your Gemini API key" }, { status: 500 })
+    const message = err instanceof Error ? err.message : "Unknown Gemini error"
+    return NextResponse.json({ error: `Analysis failed: ${message}` }, { status: 500 })
   }
 
   // Persist transcript, duration, and audio URL on the response

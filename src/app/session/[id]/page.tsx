@@ -180,9 +180,9 @@ export default function SessionPage() {
                 />
               )}
               {phase === "feedback" && (
-                <div className="rounded-xl border border-gray-800 bg-gray-900 p-4">
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Your transcript</p>
-                  <p className="text-sm text-gray-400 italic leading-relaxed">&ldquo;{currentTranscript}&rdquo;</p>
+                <div className="rounded-xl border border-gray-800 bg-gray-900 p-4 h-full">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Recording complete</p>
+                  <p className="text-sm text-gray-400">Your response has been analyzed. Review your transcript and feedback on the right.</p>
                 </div>
               )}
             </div>
@@ -190,6 +190,10 @@ export default function SessionPage() {
             <div>
               {phase === "feedback" && currentFeedback && (
                 <div className="space-y-4">
+                  <div className="rounded-xl border border-indigo-900/50 bg-indigo-950/30 p-4">
+                    <p className="text-xs text-indigo-400 uppercase tracking-wider mb-2">Your transcript</p>
+                    <p className="text-sm text-gray-300 leading-relaxed">&ldquo;{currentTranscript}&rdquo;</p>
+                  </div>
                   <FeedbackPanel feedback={{ ...currentFeedback, transcript: currentTranscript }} />
                   <Button
                     onClick={nextQuestion}

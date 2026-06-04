@@ -15,7 +15,7 @@ describe('getQuestionsForSession', () => {
     })
   })
 
-  it('returns questions from all categories for company-specific session type', () => {
+  it('can return questions from multiple categories for company-specific session type', () => {
     const seen = new Set<string>()
     for (let i = 0; i < 100; i++) {
       getQuestionsForSession('company-specific', undefined, 20).forEach((q) =>
@@ -36,7 +36,7 @@ describe('getQuestionsForSession', () => {
   it('falls back to full filtered set when fewer than count industry matches exist', () => {
     // No technical questions have 'finance' industry → 0 < 3 → falls back to all technical
     const questions = getQuestionsForSession('technical', 'finance', 3)
-    expect(questions.length).toBeGreaterThan(0)
+    expect(questions.length).toBe(3)
     questions.forEach((q) => {
       expect(q.category).toBe('technical')
     })

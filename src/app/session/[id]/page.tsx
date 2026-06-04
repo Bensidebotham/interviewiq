@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Navigation } from "@/components/Navigation"
 import { VideoRecorder } from "@/components/VideoRecorder"
@@ -54,17 +54,22 @@ export default function SessionPage() {
   const [currentFeedback, setCurrentFeedback] = useState<FeedbackData | null>(null)
   const [currentTranscript, setCurrentTranscript] = useState("")
   const [phase, setPhase] = useState<"recording" | "feedback" | "done">("recording")
+  const hasFetchedRef = useRef(false)
 
-  const fetchSession = useCallback(async () => {
-    const res = await fetch(`/api/sessions/${id}`)
-    if (!res.ok) { router.push("/dashboard"); return }
-    const { session: data } = await res.json()
-    setSession(data)
-    setQuestionIndex(data.responses.length)
-    setLoading(false)
+  useEffect(() => {
+    if (hasFetchedRef.current) return
+    hasFetchedRef.current = true
+
+    const loadSession = async () => {
+      const res = await fetch(`/api/sessions/${id}`)
+      if (!res.ok) { router.push("/dashboard"); return }
+      const { session: data } = await res.json()
+      setSession(data)
+      setQuestionIndex(data.responses.length)
+      setLoading(false)
+    }
+    loadSession()
   }, [id, router])
-
-  useEffect(() => { fetchSession() }, [fetchSession])
 
   const questions: Question[] = session?.questions ?? []
   const currentQuestion = questions[questionIndex]

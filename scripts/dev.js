@@ -4,11 +4,12 @@
 // If the count exceeds MAX_NODE_PROCS, it kills the dev server and exits
 // cleanly rather than letting hundreds of workers freeze the machine.
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { spawn, execSync } = require("child_process")
+const nextBin = require.resolve("next/dist/bin/next")
 
 const MAX_NODE_PROCS = 30 // workerThreads keeps this low; spike above 30 means something went wrong
 const POLL_MS = 3000
-const nextBin = require.resolve("next/dist/bin/next")
 
 const server = spawn(process.execPath, [nextBin, "dev", "--webpack", "--port", "3030"], {
   stdio: "inherit",

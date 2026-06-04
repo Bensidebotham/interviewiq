@@ -20,7 +20,7 @@ const previewFillers = [
 ]
 
 // ─── Feature bento data ─────────────────────────────────────────────────────
-
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const features = [
   {
     icon: BarChart2,
@@ -130,7 +130,7 @@ function FeedbackPreviewCard() {
 
       {/* Question */}
       <p className="mb-4 text-sm font-medium text-zinc-200 leading-snug">
-        "Tell me about yourself."
+        &ldquo;Tell me about yourself.&rdquo;
       </p>
 
       {/* Score bars */}
@@ -353,7 +353,7 @@ export default function LandingPage() {
                 className="text-3xl font-bold text-white lg:text-4xl"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Feedback that's actually useful.
+                Feedback that&apos;s actually useful.
               </h2>
             </div>
 
@@ -428,7 +428,7 @@ export default function LandingPage() {
                   STAR breakdown
                 </h3>
                 <p className="text-sm leading-relaxed text-zinc-500">
-                  Pinpoints exactly which parts of Situation, Task, Action, Result were missing from your answer — not just that it was "unclear."
+                  Pinpoints exactly which parts of Situation, Task, Action, Result were missing from your answer — not just that it was &ldquo;unclear.&rdquo;
                 </p>
               </div>
 
@@ -447,7 +447,7 @@ export default function LandingPage() {
                   Filler word detection
                 </h3>
                 <p className="mb-5 text-sm leading-relaxed text-zinc-500">
-                  Every "um", "like", and "you know" is caught, counted, and flagged — so you can track how you improve over multiple sessions.
+                  Every &ldquo;um&rdquo;, &ldquo;like&rdquo;, and &ldquo;you know&rdquo; is caught, counted, and flagged — so you can track how you improve over multiple sessions.
                 </p>
                 {/* Filler chips */}
                 <div className="flex flex-wrap gap-2">

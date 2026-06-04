@@ -44,6 +44,7 @@ export function Navigation() {
       <div className="border-t border-gray-800 pt-4">
         <div className="mb-3 flex items-center gap-3 px-3">
           {session?.user?.image && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={session.user.image} alt="" className="h-7 w-7 rounded-full" />
           )}
           <span className="truncate text-sm text-gray-400">{session?.user?.name}</span>

@@ -40,7 +40,7 @@ test.describe('Interview session — happy path', () => {
       page.getByText('Excellent response demonstrating relevant experience.')
     ).toBeVisible({ timeout: 10_000 })
 
-    // Score value should be visible
-    await expect(page.getByText('8')).toBeVisible()
+    // Score value should be visible (exact match to avoid matching "8/10" substrings)
+    await expect(page.getByText('8', { exact: true }).first()).toBeVisible()
   })
 })

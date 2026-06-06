@@ -10,8 +10,8 @@ export const mockSession = {
   jobDescription: null,
   status: 'active',
   userId: MOCK_USER_ID,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: '2026-01-01T00:00:00.000Z',
+  updatedAt: '2026-01-01T00:00:00.000Z',
   completedAt: null,
   triggerRunId: null,
   questions: [
@@ -48,7 +48,7 @@ export const mockFeedback = {
   fillerWords: ['um', 'like'],
   missingStarComponents: [],
   resumeAlignmentNotes: null,
-  createdAt: new Date().toISOString(),
+  createdAt: '2026-01-01T00:00:00.000Z',
 }
 
 export const mockSessionsList = {
@@ -58,7 +58,7 @@ export const mockSessionsList = {
       sessionType: 'behavioral',
       companyName: 'Acme Corp',
       status: 'completed',
-      createdAt: new Date().toISOString(),
+      createdAt: '2026-01-01T00:00:00.000Z',
       responses: [
         { id: 'r1', questionText: 'Q1', feedback: { overallScore: 8 } },
       ],
@@ -68,7 +68,7 @@ export const mockSessionsList = {
       sessionType: 'technical',
       companyName: null,
       status: 'completed',
-      createdAt: new Date().toISOString(),
+      createdAt: '2026-01-01T00:00:00.000Z',
       responses: [
         { id: 'r2', questionText: 'Q2', feedback: { overallScore: 7 } },
         { id: 'r3', questionText: 'Q3', feedback: { overallScore: 9 } },

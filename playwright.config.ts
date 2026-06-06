@@ -1,3 +1,6 @@
+import { config as dotenvConfig } from 'dotenv'
+dotenvConfig({ path: '.env.local', override: false })
+
 import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({

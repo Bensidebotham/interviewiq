@@ -8,13 +8,11 @@ type Fixtures = {
 }
 
 export const test = base.extend<Fixtures>({
-  authedPage: async ({ browser }, use) => {
-    const context = await browser.newContext()
-    const page = await context.newPage()
+  authedPage: async ({ context, page }, use) => {
     await setAuthCookie(context)
     await page.addInitScript(MEDIA_STUB_SCRIPT)
     await use(page)
-    await context.close()
+    // Playwright manages context lifecycle — no need to close manually
   },
 })
 

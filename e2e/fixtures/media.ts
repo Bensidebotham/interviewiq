@@ -12,8 +12,10 @@ export const MEDIA_STUB_SCRIPT = `
     canvas.width = 64
     canvas.height = 64
     const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#111'
-    ctx.fillRect(0, 0, 64, 64)
+    if (ctx) {
+      ctx.fillStyle = '#111'
+      ctx.fillRect(0, 0, 64, 64)
+    }
     return canvas.captureStream(1)
   }
 

@@ -344,7 +344,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* ── Feature bento grid ───────────────────────────────────────────── */}
+        {/* ── Bento grid (Chronicle-style) ───────────────────────────────── */}
         <section className="px-6 py-24 lg:px-12">
           <div className="mx-auto max-w-6xl">
             <div className="mb-12">
@@ -357,116 +357,131 @@ export default function LandingPage() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              {/* Card 1 — large */}
-              <div
-                className="group relative col-span-1 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] md:col-span-2"
-              >
-                <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.2)" }}
-                >
-                  <BarChart2 className="h-5 w-5 text-indigo-400" />
-                </div>
-                <h3
-                  className="mb-2 text-lg font-bold text-white"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  5-dimension scoring
-                </h3>
-                <p className="mb-6 text-sm leading-relaxed text-zinc-500">
-                  Content, delivery, eye contact, body language, and STAR structure — each scored independently so you know exactly what to fix next session.
+            {/* Row 1 */}
+            <div className="mb-4 grid grid-cols-3 gap-4">
+              {/* Score breakdown — col-span-2 */}
+              <div className="col-span-2 rounded-2xl border border-[#1e1e25] bg-[#111116] p-6">
+                <p className="mb-1 text-xs font-medium uppercase tracking-widest text-[#52525c]">5-dimension scoring</p>
+                <p className="mb-5 text-lg font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  Every dimension, scored independently.
                 </p>
-                {/* Mini score preview */}
-                <div className="space-y-2">
-                  {[{ l: "Content & STAR", v: 84 }, { l: "Verbal Delivery", v: 76 }, { l: "Eye Contact", v: 80 }].map((s) => (
-                    <div key={s.l} className="flex items-center gap-3">
-                      <span className="w-28 shrink-0 text-xs text-zinc-600">{s.l}</span>
-                      <div className="h-1 flex-1 rounded-full bg-white/5">
+                <div className="space-y-3">
+                  {[
+                    { label: "Content & STAR", score: 84 },
+                    { label: "Verbal Delivery", score: 72 },
+                    { label: "Eye Contact", score: 88 },
+                    { label: "Body Language", score: 79 },
+                    { label: "Filler Words", score: 65 },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-center gap-3">
+                      <span className="w-32 shrink-0 text-xs text-[#52525c]">{s.label}</span>
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#1e1e25]">
                         <div
-                          className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-400"
-                          style={{ width: `${s.v}%` }}
+                          className="h-full rounded-full"
+                          style={{
+                            width: `${s.score}%`,
+                            background: s.score >= 80
+                              ? "linear-gradient(90deg, #6366f1, #8b5cf6)"
+                              : s.score >= 65
+                              ? "#fbbf24"
+                              : "#f87171",
+                          }}
                         />
                       </div>
-                      <span className="w-6 text-right text-xs text-zinc-500">{s.v}</span>
+                      <span className="w-7 text-right text-xs text-[#52525c]">{s.score}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* Card 2 — small */}
-              <div className="group relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]">
-                <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.2)" }}
-                >
-                  <FileText className="h-5 w-5 text-violet-400" />
-                </div>
-                <h3
-                  className="mb-2 text-lg font-bold text-white"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  Resume-aware feedback
-                </h3>
-                <p className="text-sm leading-relaxed text-zinc-500">
-                  Paste your resume and target role. The AI references your actual experience and flags stronger examples you could have used.
+              {/* Filler word detection — col-span-1 */}
+              <div className="rounded-2xl border border-[#1e1e25] bg-[#111116] p-6">
+                <p className="mb-1 text-xs font-medium uppercase tracking-widest text-[#52525c]">Filler word detection</p>
+                <p className="mb-5 text-base font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  Every &ldquo;um&rdquo; caught and counted.
                 </p>
-              </div>
-
-              {/* Card 3 — small */}
-              <div className="group relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04]">
-                <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(165,180,252,0.1)", border: "1px solid rgba(165,180,252,0.15)" }}
-                >
-                  <MessageSquare className="h-5 w-5 text-indigo-300" />
-                </div>
-                <h3
-                  className="mb-2 text-lg font-bold text-white"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  STAR breakdown
-                </h3>
-                <p className="text-sm leading-relaxed text-zinc-500">
-                  Pinpoints exactly which parts of Situation, Task, Action, Result were missing from your answer — not just that it was &ldquo;unclear.&rdquo;
-                </p>
-              </div>
-
-              {/* Card 4 — large */}
-              <div className="group relative col-span-1 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-300 hover:border-white/[0.12] hover:bg-white/[0.04] md:col-span-2">
-                <div
-                  className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl"
-                  style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.2)" }}
-                >
-                  <Mic className="h-5 w-5 text-indigo-400" />
-                </div>
-                <h3
-                  className="mb-2 text-lg font-bold text-white"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  Filler word detection
-                </h3>
-                <p className="mb-5 text-sm leading-relaxed text-zinc-500">
-                  Every &ldquo;um&rdquo;, &ldquo;like&rdquo;, and &ldquo;you know&rdquo; is caught, counted, and flagged — so you can track how you improve over multiple sessions.
-                </p>
-                {/* Filler chips */}
                 <div className="flex flex-wrap gap-2">
-                  {[{ w: "um", c: 3 }, { w: "like", c: 5 }, { w: "you know", c: 2 }, { w: "basically", c: 4 }, { w: "sort of", c: 1 }].map((f) => (
+                  {[
+                    { word: "um", count: 3 },
+                    { word: "like", count: 5 },
+                    { word: "uh", count: 2 },
+                    { word: "you know", count: 1 },
+                    { word: "basically", count: 4 },
+                  ].map((f) => (
                     <span
-                      key={f.w}
-                      className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs"
-                      style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", color: "#71717a" }}
+                      key={f.word}
+                      className="flex items-center gap-1.5 rounded-full border border-red-500/20 bg-red-500/10 px-2.5 py-1 text-xs text-red-400"
                     >
-                      <span className="font-medium text-zinc-300">{f.w}</span>
-                      <span
-                        className="flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold"
-                        style={{ background: "rgba(239,68,68,0.15)", color: "#f87171" }}
-                      >
-                        {f.c}
-                      </span>
+                      {f.word}
+                      <span className="font-bold">&times;{f.count}</span>
                     </span>
                   ))}
                 </div>
+                <p className="mt-4 text-xs leading-relaxed text-[#52525c]">
+                  Track improvement across sessions as the count drops.
+                </p>
+              </div>
+            </div>
+
+            {/* Row 2 */}
+            <div className="grid grid-cols-3 gap-4">
+              {/* STAR check */}
+              <div className="rounded-2xl border border-[#1e1e25] bg-[#111116] p-6">
+                <p className="mb-1 text-xs font-medium uppercase tracking-widest text-[#52525c]">STAR framework</p>
+                <p className="mb-4 text-base font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  Pinpoints what was missing.
+                </p>
+                <div className="space-y-2.5">
+                  {[
+                    { label: "Situation", present: true },
+                    { label: "Task", present: true },
+                    { label: "Action", present: true },
+                    { label: "Result", present: false },
+                  ].map((c) => (
+                    <div key={c.label} className="flex items-center justify-between">
+                      <span className="text-sm text-[#a0a0ac]">{c.label}</span>
+                      {c.present ? (
+                        <span className="text-xs font-medium text-emerald-400">&#10003; Present</span>
+                      ) : (
+                        <span className="text-xs font-medium text-red-400">&#10007; Missing</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Transcript excerpt */}
+              <div className="rounded-2xl border border-[#1e1e25] bg-[#111116] p-6">
+                <p className="mb-1 text-xs font-medium uppercase tracking-widest text-[#52525c]">Transcript</p>
+                <p className="mb-4 text-base font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  See exactly what you said.
+                </p>
+                <p className="font-mono text-xs leading-relaxed text-[#52525c]">
+                  &ldquo;So I was working on, <span className="rounded bg-red-500/15 px-0.5 text-red-400">um</span>, the growth team and we had this project where{" "}
+                  <span className="rounded bg-red-500/15 px-0.5 text-red-400">like</span> the retention numbers
+                  were dropping and I had to figure out why…&rdquo;
+                </p>
+              </div>
+
+              {/* Eye contact */}
+              <div className="rounded-2xl border border-[#1e1e25] bg-[#111116] p-6">
+                <p className="mb-1 text-xs font-medium uppercase tracking-widest text-[#52525c]">Eye contact</p>
+                <p className="mb-4 text-base font-bold text-white" style={{ fontFamily: "var(--font-display)" }}>
+                  Body language matters.
+                </p>
+                <p
+                  className="mb-1 text-4xl font-black"
+                  style={{
+                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  73%
+                </p>
+                <p className="text-xs leading-relaxed text-[#52525c]">
+                  Looked away frequently in the first 30s. Maintain camera contact during transitions.
+                </p>
               </div>
             </div>
           </div>

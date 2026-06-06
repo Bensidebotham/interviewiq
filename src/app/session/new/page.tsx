@@ -3,10 +3,6 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Navigation } from "@/components/Navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 const SESSION_TYPES = [
@@ -28,6 +24,9 @@ const SESSION_TYPES = [
 ]
 
 const INDUSTRIES = ["tech", "finance", "consulting", "general"]
+
+const inputClass =
+  "w-full rounded-md border border-[#1e1e25] bg-[#111116] px-3 py-2 text-sm text-[#f5f5f8] placeholder:text-[#3a3a45] outline-none transition-colors focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/30"
 
 export default function NewSessionPage() {
   const router = useRouter()
@@ -61,56 +60,72 @@ export default function NewSessionPage() {
     <div className="flex h-full">
       <Navigation />
       <main className="flex-1 overflow-auto p-8">
-        <div className="max-w-xl space-y-8">
+        <div className="mx-auto max-w-xl space-y-8">
+          {/* Header */}
           <div>
-            <h1 className="text-2xl font-bold">New Practice Session</h1>
-            <p className="mt-1 text-sm text-gray-400">Step {step} of 2</p>
+            <h1
+              className="text-2xl font-bold text-[#f5f5f8]"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              New Practice Session
+            </h1>
+            <p className="mt-1 text-sm text-[#52525c]">Step {step} of 2</p>
           </div>
 
-          {/* Progress bar */}
-          <div className="h-1 w-full rounded-full bg-gray-800">
-            <div
-              className="h-1 rounded-full bg-indigo-500 transition-all duration-300"
-              style={{ width: step === 1 ? "50%" : "100%" }}
-            />
+          {/* Step dots */}
+          <div className="flex items-center gap-2">
+            {[1, 2].map((n) => (
+              <div
+                key={n}
+                className="h-2 rounded transition-all"
+                style={{
+                  background:
+                    n <= step
+                      ? "linear-gradient(135deg, #6366f1, #8b5cf6)"
+                      : "#1e1e25",
+                  width: n === step ? "24px" : "8px",
+                }}
+              />
+            ))}
           </div>
 
           {step === 1 && (
             <div className="space-y-4">
-              <h2 className="font-semibold text-gray-200">What type of session?</h2>
+              <h2 className="font-semibold text-[#f5f5f8]">What type of session?</h2>
               <div className="grid gap-3">
                 {SESSION_TYPES.map((t) => (
                   <button
                     key={t.id}
                     onClick={() => setSessionType(t.id)}
                     className={cn(
-                      "rounded-xl border p-4 text-left transition-colors",
+                      "rounded-xl border p-4 text-left transition-all",
                       sessionType === t.id
-                        ? "border-indigo-500 bg-indigo-950/40"
-                        : "border-gray-800 bg-gray-900 hover:border-gray-700"
+                        ? "border-indigo-500/50 bg-indigo-500/5 shadow-[0_0_0_1px_rgba(99,102,241,0.2)]"
+                        : "border-[#1e1e25] bg-[#111116] hover:border-[#2a2a35]"
                     )}
                   >
-                    <p className="font-medium">{t.label}</p>
-                    <p className="mt-0.5 text-sm text-gray-400">{t.description}</p>
+                    <p className="font-medium text-[#f5f5f8]">{t.label}</p>
+                    <p className="mt-0.5 text-sm text-[#52525c]">{t.description}</p>
                   </button>
                 ))}
               </div>
-              <Button
+              <button
                 onClick={() => setStep(2)}
                 disabled={!sessionType}
-                className="w-full bg-indigo-600 hover:bg-indigo-500"
+                className="w-full rounded-md px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)" }}
               >
                 Next
-              </Button>
+              </button>
             </div>
           )}
 
           {step === 2 && (
             <div className="space-y-5">
-              <h2 className="font-semibold text-gray-200">Add context (optional)</h2>
+              <h2 className="font-semibold text-[#f5f5f8]">Add context (optional)</h2>
 
               <div className="space-y-2">
-                <Label className="text-gray-300">Industry</Label>
+                <label className="text-sm font-medium text-[#a0a0ac]">Industry</label>
                 <div className="flex flex-wrap gap-2">
                   {INDUSTRIES.map((ind) => (
                     <button
@@ -119,8 +134,8 @@ export default function NewSessionPage() {
                       className={cn(
                         "rounded-full border px-4 py-1.5 text-sm capitalize transition-colors",
                         industry === ind
-                          ? "border-indigo-500 bg-indigo-950/40 text-indigo-300"
-                          : "border-gray-700 bg-gray-900 text-gray-400 hover:border-gray-600"
+                          ? "border-indigo-500/50 bg-indigo-500/10 text-indigo-300"
+                          : "border-[#1e1e25] bg-[#111116] text-[#52525c] hover:border-[#2a2a35] hover:text-[#a0a0ac]"
                       )}
                     >
                       {ind}
@@ -130,26 +145,31 @@ export default function NewSessionPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="company" className="text-gray-300">Company (optional)</Label>
-                <Input
+                <label htmlFor="company" className="text-sm font-medium text-[#a0a0ac]">
+                  Company (optional)
+                </label>
+                <input
                   id="company"
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   placeholder="e.g. Google, McKinsey"
-                  className="bg-gray-900 border-gray-700 text-gray-100 placeholder:text-gray-600"
+                  className={inputClass}
                 />
               </div>
 
               {sessionType === "company-specific" && (
                 <div className="space-y-2">
-                  <Label htmlFor="jd" className="text-gray-300">Job description</Label>
-                  <Textarea
+                  <label htmlFor="jd" className="text-sm font-medium text-[#a0a0ac]">
+                    Job description
+                  </label>
+                  <textarea
                     id="jd"
                     value={jobDescription}
                     onChange={(e) => setJobDescription(e.target.value)}
                     placeholder="Paste the job description here…"
                     rows={6}
-                    className="bg-gray-900 border-gray-700 text-gray-100 placeholder:text-gray-600"
+                    className={inputClass}
+                    style={{ resize: "vertical" }}
                   />
                 </div>
               )}
@@ -157,20 +177,20 @@ export default function NewSessionPage() {
               {error && <p className="text-sm text-red-400">{error}</p>}
 
               <div className="flex gap-3">
-                <Button
-                  variant="outline"
+                <button
                   onClick={() => setStep(1)}
-                  className="border-gray-700 text-gray-300 hover:bg-gray-800"
+                  className="rounded-md border border-[#1e1e25] px-4 py-2 text-sm font-medium text-[#52525c] transition-colors hover:border-[#2a2a35] hover:text-[#a0a0ac]"
                 >
                   Back
-                </Button>
-                <Button
+                </button>
+                <button
                   onClick={handleStart}
                   disabled={loading}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-500"
+                  className="flex-1 rounded-md px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                  style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)" }}
                 >
                   {loading ? "Starting…" : "Start Session"}
-                </Button>
+                </button>
               </div>
             </div>
           )}

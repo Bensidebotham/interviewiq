@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Mic, BarChart2, FileText, MessageSquare, ArrowRight, CheckCircle, Zap } from "lucide-react"
+import { Mic, ArrowRight, CheckCircle, Zap } from "lucide-react"
 
 // ─── Mock data for the live feedback preview card ───────────────────────────
 
@@ -17,35 +17,6 @@ const previewFillers = [
   { word: "um", count: 3 },
   { word: "like", count: 2 },
   { word: "you know", count: 1 },
-]
-
-// ─── Feature bento data ─────────────────────────────────────────────────────
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const features = [
-  {
-    icon: BarChart2,
-    title: "5-dimension scoring",
-    body: "Content, delivery, eye contact, body language, and STAR structure — each scored independently so you see exactly what to fix.",
-    span: "col-span-2",
-  },
-  {
-    icon: FileText,
-    title: "Resume-aware",
-    body: "Paste your resume. The AI flags stronger examples from your actual experience that you could have used.",
-    span: "col-span-1",
-  },
-  {
-    icon: MessageSquare,
-    title: "STAR breakdown",
-    body: "Pinpoints exactly which parts of Situation, Task, Action, Result were missing.",
-    span: "col-span-1",
-  },
-  {
-    icon: Mic,
-    title: "Filler word detection",
-    body: "Every 'um', 'like', and 'you know' caught and counted — so you can track improvement session over session.",
-    span: "col-span-2",
-  },
 ]
 
 // ─── How it works steps ─────────────────────────────────────────────────────

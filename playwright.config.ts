@@ -21,6 +21,7 @@ export default defineConfig({
     },
   ],
   webServer: {
+    // In CI, the e2e job runs `npm run build` before playwright test — so npm start is enough here.
     command: process.env.CI ? 'npm start' : 'npm run build && npm start',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,

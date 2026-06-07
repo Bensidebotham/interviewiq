@@ -213,7 +213,7 @@ export default async function DashboardPage() {
           </div>
 
           {/* Score sparkline */}
-          {sparklineScores.length >= 1 && (
+          {sparklineScores.length >= 2 && (
             <div className="rounded-lg border border-[#1e1e25] bg-[#111116] p-4">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#52525c]">Score trend</span>

@@ -232,6 +232,7 @@ export default function SessionPage() {
 
           {/* Video recorder */}
           <VideoRecorder
+            key={questionIndex}
             sessionId={id}
             questionText={currentQuestion.text}
             questionCategory={currentQuestion.category}

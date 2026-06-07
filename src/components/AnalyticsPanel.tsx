@@ -541,7 +541,7 @@ export function AnalyticsPanel({
 
                 <div className="rounded-r-lg border border-indigo-500/15 border-l-2 border-l-indigo-500 bg-[#111116] p-3">
                   <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wider text-indigo-400">
-                    ↑ Delivery
+                    ↑ {feedback.deliveryScore <= feedback.eyeContactScore ? "Verbal delivery" : "Eye contact"}
                   </p>
                   <p className="text-xs leading-relaxed text-[#a0a0ac]">
                     {feedback.deliveryScore <= feedback.eyeContactScore

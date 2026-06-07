@@ -68,6 +68,7 @@ export function VideoRecorder({ sessionId, questionText, questionCategory, sessi
     if (timerRef.current) clearInterval(timerRef.current)
     if (frameTimerRef.current) clearInterval(frameTimerRef.current)
     if (pollIntervalRef.current) clearTimeout(pollIntervalRef.current)
+    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
   }, [stopStream])
 
   useEffect(() => { onCompleteRef.current = onComplete }, [onComplete])

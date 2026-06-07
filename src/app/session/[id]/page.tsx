@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Navigation } from "@/components/Navigation"
 import { VideoRecorder } from "@/components/VideoRecorder"
-import { FeedbackPanel } from "@/components/FeedbackPanel"
-import { ChevronRight, CheckCircle } from "lucide-react"
+import { AnalyticsPanel } from "@/components/AnalyticsPanel"
+import { CheckCircle } from "lucide-react"
 
 type Question = {
   id: string
@@ -51,6 +51,7 @@ export default function SessionPage() {
   const [questionIndex, setQuestionIndex] = useState(0)
   const [currentFeedback, setCurrentFeedback] = useState<FeedbackData | null>(null)
   const [currentTranscript, setCurrentTranscript] = useState("")
+  const [currentVideoUrl, setCurrentVideoUrl] = useState("")
   const [phase, setPhase] = useState<"recording" | "feedback" | "done">("recording")
   const hasFetchedRef = useRef(false)
 
@@ -73,9 +74,10 @@ export default function SessionPage() {
   const currentQuestion = questions[questionIndex]
   const isLastQuestion = questionIndex >= questions.length - 1
 
-  const handleAnalysisComplete = (feedback: unknown, transcript: string, _videoUrl: string) => {
+  const handleAnalysisComplete = (feedback: unknown, transcript: string, videoUrl: string) => {
     setCurrentFeedback(feedback as FeedbackData)
     setCurrentTranscript(transcript)
+    setCurrentVideoUrl(videoUrl)
     setPhase("feedback")
   }
 
@@ -87,6 +89,7 @@ export default function SessionPage() {
     }
     setCurrentFeedback(null)
     setCurrentTranscript("")
+    setCurrentVideoUrl("")
     setQuestionIndex((i) => i + 1)
     setPhase("recording")
   }
@@ -151,11 +154,37 @@ export default function SessionPage() {
     )
   }
 
+  if (phase === "feedback" && currentFeedback) {
+    return (
+      <div className="flex h-full">
+        <Navigation />
+        <div className="flex flex-1 flex-col min-h-0">
+          <AnalyticsPanel
+            feedback={currentFeedback}
+            transcript={currentTranscript}
+            videoUrl={currentVideoUrl}
+            questionText={currentQuestion.text}
+            questionIndex={questionIndex}
+            totalQuestions={questions.length}
+            isLastQuestion={isLastQuestion}
+            onNext={nextQuestion}
+            onReRecord={() => {
+              setCurrentFeedback(null)
+              setCurrentTranscript("")
+              setCurrentVideoUrl("")
+              setPhase("recording")
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-full">
       <Navigation />
       <main className="flex-1 overflow-auto p-8">
-        <div className="max-w-4xl space-y-6">
+        <div className="mx-auto max-w-2xl space-y-5">
           {/* Progress */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -177,7 +206,7 @@ export default function SessionPage() {
             </div>
           </div>
 
-          {/* Question */}
+          {/* Question card */}
           <div className="rounded-xl border border-[#1e1e25] bg-[#111116] p-6">
             <p className="mb-2 text-xs uppercase tracking-widest text-[#52525c]">
               {currentQuestion.category}
@@ -195,48 +224,14 @@ export default function SessionPage() {
             )}
           </div>
 
-          {/* Two-column layout: recorder + feedback */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div>
-              {phase === "recording" && (
-                <VideoRecorder
-                  sessionId={id}
-                  questionText={currentQuestion.text}
-                  questionCategory={currentQuestion.category}
-                  sessionType={session?.sessionType ?? "behavioral"}
-                  onComplete={handleAnalysisComplete}
-                />
-              )}
-              {phase === "feedback" && (
-                <div className="rounded-xl border border-[#1e1e25] bg-[#111116] p-4 h-full">
-                  <p className="mb-3 text-xs uppercase tracking-wider text-[#52525c]">Recording complete</p>
-                  <p className="text-sm text-[#52525c]">
-                    Your response has been analyzed. Review your feedback on the right.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              {phase === "feedback" && currentFeedback && (
-                <div className="space-y-4">
-                  <div className="rounded-xl border border-indigo-900/50 bg-indigo-950/30 p-4">
-                    <p className="text-xs text-indigo-400 uppercase tracking-wider mb-2">Your transcript</p>
-                    <p className="text-sm text-gray-300 leading-relaxed">&ldquo;{currentTranscript}&rdquo;</p>
-                  </div>
-                  <FeedbackPanel feedback={{ ...currentFeedback, transcript: currentTranscript }} />
-                  <button
-                    onClick={nextQuestion}
-                    className="flex w-full items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
-                    style={{ background: "linear-gradient(135deg, #6366f1, #7c3aed)" }}
-                  >
-                    {isLastQuestion ? "Finish session" : "Next question"}
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Video recorder */}
+          <VideoRecorder
+            sessionId={id}
+            questionText={currentQuestion.text}
+            questionCategory={currentQuestion.category}
+            sessionType={session?.sessionType ?? "behavioral"}
+            onComplete={handleAnalysisComplete}
+          />
         </div>
       </main>
     </div>

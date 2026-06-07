@@ -142,4 +142,8 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
+  @keyframes waveBar {
+    from { height: 4px; opacity: 0.5; }
+    to   { height: 16px; opacity: 1; }
+  }
 }

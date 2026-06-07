@@ -73,7 +73,7 @@ export default function SessionPage() {
   const currentQuestion = questions[questionIndex]
   const isLastQuestion = questionIndex >= questions.length - 1
 
-  const handleAnalysisComplete = (feedback: unknown, transcript: string) => {
+  const handleAnalysisComplete = (feedback: unknown, transcript: string, _videoUrl: string) => {
     setCurrentFeedback(feedback as FeedbackData)
     setCurrentTranscript(transcript)
     setPhase("feedback")

@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState, useEffect, type CSSProperties, type ReactElement } from "react"
+import { useRef, useState, useEffect, useMemo, type CSSProperties, type ReactElement } from "react"
 import { FeedbackPanel } from "@/components/FeedbackPanel"
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ function buildSegments(missingStarComponents: string[]): Segment[] {
   return [
     { label: "S", startPct: 0,  widthPct: 25, status: missing.has("S") ? "missing" : "present" },
     { label: "T", startPct: 25, widthPct: 15, status: missing.has("T") ? "missing" : "present" },
-    { label: "A", startPct: 40, widthPct: 44, status: missing.has("A") ? "missing" : "weak" },
+    { label: "A", startPct: 40, widthPct: 44, status: missing.has("A") ? "missing" : "present" },
     { label: "R", startPct: 84, widthPct: 16, status: missing.has("R") ? "missing" : "present" },
   ]
 }
@@ -122,7 +122,7 @@ function highlightFillers(text: string, fillerWords: string[]): ReactElement {
   return (
     <>
       {parts.map((part, i) =>
-        pattern.test(part) ? (
+        i % 2 === 1 ? (
           <span key={i} className="rounded bg-red-500/15 px-0.5 text-red-400">
             {part}
           </span>
@@ -187,9 +187,18 @@ export function AnalyticsPanel({
   const [activeSegment, setActiveSegment] = useState<Segment | null>(null)
   const [activeTab, setActiveTab] = useState<"coaching" | "scores" | "model">("coaching")
 
-  const segments = buildSegments(feedback.missingStarComponents)
-  const transcriptLines = buildTranscriptLines(transcript, feedback.missingStarComponents)
-  const missing = new Set(feedback.missingStarComponents.map((s) => s.charAt(0).toUpperCase()))
+  const segments = useMemo(
+    () => buildSegments(feedback.missingStarComponents),
+    [feedback.missingStarComponents]
+  )
+  const transcriptLines = useMemo(
+    () => buildTranscriptLines(transcript, feedback.missingStarComponents),
+    [transcript, feedback.missingStarComponents]
+  )
+  const missing = useMemo(
+    () => new Set(feedback.missingStarComponents.map((s) => s.charAt(0).toUpperCase())),
+    [feedback.missingStarComponents]
+  )
 
   useEffect(() => {
     const video = videoRef.current
@@ -264,6 +273,7 @@ export function AnalyticsPanel({
               ref={videoRef}
               src={videoUrl}
               className="h-full w-full object-cover"
+              playsInline
               onClick={() => {
                 const v = videoRef.current
                 if (!v) return
@@ -292,12 +302,9 @@ export function AnalyticsPanel({
                   color: segmentLabelColor(activeSegment.status),
                 }}
               >
-                {{
-                  S: "Situation",
-                  T: "Task",
-                  A: "Action — needs improvement",
-                  R: "Result missing",
-                }[activeSegment.label]}
+                {activeSegment.status === "missing"
+                  ? `${activeSegment.label === "R" ? "Result" : activeSegment.label} — missing`
+                  : { S: "Situation", T: "Task", A: "Action", R: "Result" }[activeSegment.label]}
               </div>
             )}
 
@@ -500,15 +507,16 @@ export function AnalyticsPanel({
                     </div>
                     {(() => {
                       const filler = feedback.fillerWords[0]
+                      const escaped = filler.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
                       const exampleSentence = transcript
                         .split(/(?<=[.!?])\s+/)
                         .find((s) =>
-                          new RegExp(`\\b${filler}\\b`, "i").test(s)
+                          new RegExp(`\\b${escaped}\\b`, "i").test(s)
                         )
                       if (!exampleSentence) return null
                       const cleaned = exampleSentence
                         .replace(
-                          new RegExp(`\\b${filler}\\b,?\\s?`, "gi"),
+                          new RegExp(`\\b${escaped}\\b,?\\s?`, "gi"),
                           ""
                         )
                         .trim()

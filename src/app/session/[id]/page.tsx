@@ -70,6 +70,12 @@ export default function SessionPage() {
     loadSession()
   }, [id, router])
 
+  useEffect(() => {
+    return () => {
+      if (currentVideoUrl) URL.revokeObjectURL(currentVideoUrl)
+    }
+  }, [currentVideoUrl])
+
   const questions: Question[] = session?.questions ?? []
   const currentQuestion = questions[questionIndex]
   const isLastQuestion = questionIndex >= questions.length - 1
